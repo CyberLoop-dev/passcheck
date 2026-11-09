@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self'; connect-src 'none'; form-action 'none'; base-uri 'none'">
+<meta name="referrer" content="no-referrer">
+<title>PassCheck</title>
+<meta name="description" content="A privacy-first password strength checker that runs entirely in your browser.">
+<link rel="icon" href="assets/logo.svg" type="image/svg+xml">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<header class="top">
+  <div class="brand"><img src="assets/logo.svg" alt="" width="30" height="30"><span>PassCheck</span></div>
+  <button id="btn-theme" class="icon" type="button" aria-label="Toggle theme"><svg viewBox="0 0 24 24"><path d="M20 14A8 8 0 1 1 10 4a6.5 6.5 0 0 0 10 10z"/></svg></button>
+</header>
+<main>
+  <section class="hero">
+    <h1>How strong is your password?</h1>
+    <p>Check it right here. It never leaves this page.</p>
+    <ul class="privacy">
+      <li><svg viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="11" rx="2"/><path d="M9 20h6M12 16v4"/></svg>Analyzed on your device</li>
+      <li><svg viewBox="0 0 24 24"><path d="M5 7h14M10 7V4h4v3M7 7l1 13h8l1-13"/></svg>Never stored or logged</li>
+      <li><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><path d="M6 6l12 12"/></svg>No network requests</li>
+    </ul>
+  </section>
+
+  <section class="card" aria-labelledby="lbl">
+    <label for="pw" id="lbl">Type a password to test</label>
+    <div class="field">
+      <input id="pw" type="password" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" maxlength="128" placeholder="Try something you would never actually use">
+      <button id="btn-show" type="button" aria-pressed="false">Show</button>
+      <button id="btn-clear" type="button" class="ghost">Clear</button>
+    </div>
+    <div id="meter" class="meter" role="meter" aria-label="Password strength" aria-valuemin="0" aria-valuemax="4" aria-valuenow="0" data-level="-1"><i class="seg"></i><i class="seg"></i><i class="seg"></i><i class="seg"></i><i class="seg"></i></div>
+    <p id="verdict" class="verdict" aria-live="polite">Type something to begin.</p>
+    <dl class="facts">
+      <div><dt>Length</dt><dd id="f-len">-</dd></div>
+      <div><dt>Character types</dt><dd id="f-types" class="chips"><span data-k="lower">a-z</span><span data-k="upper">A-Z</span><span data-k="digit">0-9</span><span data-k="sym">#$&amp;</span></dd></div>
+      <div><dt>Unique characters</dt><dd id="f-uniq">-</dd></div>
+      <div><dt>Estimated entropy</dt><dd id="f-bits">-</dd></div>
+      <div><dt>Online guessing, throttled</dt><dd id="f-online">-</dd></div>
+      <div><dt>Offline, fast hash</dt><dd id="f-offline">-</dd></div>
+    </dl>
+  </section>
+
+  <section class="card"><h2>What we found</h2><ul id="findings" class="list"><li class="info">Nothing to analyze yet.</li></ul></section>
+  <section class="card"><h2>How to do better</h2><ul id="tips" class="list"></ul></section>
+
+  <section class="card">
+    <h2>Try fictional examples</h2>
+    <p class="dim">None of these are real passwords. Click one to see how the checker reacts.</p>
+    <div class="demos">
+      <button type="button" data-v="password123">password123</button>
+      <button type="button" data-v="Summer2024!">Summer2024!</button>
+      <button type="button" data-v="qwertyuiop">qwertyuiop</button>
+      <button type="button" data-v="aaaaaa111111">aaaaaa111111</button>
+      <button type="button" data-v="mango-lantern-orbit-velvet">mango-lantern-orbit-velvet</button>
+      <button type="button" data-v="k7#Vw!2pLq9&amp;zRb4">k7#Vw!2pLq9&amp;zRb4</button>
+    </div>
+  </section>
+
+  <details class="card">
+    <summary>How can I verify nothing is sent?</summary>
+    <p>Open your browser's developer tools, switch to the Network tab and type a password. You will see no requests. The page also ships a Content Security Policy that tells the browser to block every outside connection, and the whole source is a few small files you can read.</p>
+  </details>
+
+  <p class="disclaimer">Strength results are educational estimates from a simple model, not guarantees. This tool does not check breach databases, so a password it likes may still have leaked elsewhere. For extra caution, test the pattern of a password instead of the real thing.</p>
+</main>
+<script src="app.js"></script>
+</body>
+</html>

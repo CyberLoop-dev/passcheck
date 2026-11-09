@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="320" viewBox="0 0 1200 320" role="img" aria-label="PassCheck banner">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#0a1210"/><stop offset="1" stop-color="#10282a"/></linearGradient>
+    <linearGradient id="ac" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#3ddc97"/><stop offset="1" stop-color="#2bb6c9"/></linearGradient>
+  </defs>
+  <style>
+    .dot { fill: #8aa69d; opacity: 0; animation: type 6s ease-out infinite; }
+    .e1 { animation-delay: .2s; } .e2 { animation-delay: .4s; } .e3 { animation-delay: .6s; } .e4 { animation-delay: .8s; } .e5 { animation-delay: 1s; } .e6 { animation-delay: 1.2s; } .e7 { animation-delay: 1.4s; } .e8 { animation-delay: 1.6s; }
+    @keyframes type { 0% { opacity: 0; } 6%, 88% { opacity: 1; } 100% { opacity: 0; } }
+    .s { opacity: .18; }
+    .s1 { fill: #ff5d6c; animation: f1 6s infinite; } .s2 { fill: #ff9a4d; animation: f2 6s infinite; } .s3 { fill: #f2d04a; animation: f3 6s infinite; } .s4 { fill: #8fdc6b; animation: f4 6s infinite; } .s5 { fill: #3ddc97; animation: f5 6s infinite; }
+    @keyframes f1 { 0%, 8% { opacity: .18; } 12%, 88% { opacity: 1; } 100% { opacity: .18; } }
+    @keyframes f2 { 0%, 24% { opacity: .18; } 28%, 88% { opacity: 1; } 100% { opacity: .18; } }
+    @keyframes f3 { 0%, 40% { opacity: .18; } 44%, 88% { opacity: 1; } 100% { opacity: .18; } }
+    @keyframes f4 { 0%, 56% { opacity: .18; } 60%, 88% { opacity: 1; } 100% { opacity: .18; } }
+    @keyframes f5 { 0%, 72% { opacity: .18; } 76%, 88% { opacity: 1; } 100% { opacity: .18; } }
+    .shield { animation: beat 3s ease-in-out infinite alternate; transform-box: fill-box; transform-origin: center; }
+    @keyframes beat { from { transform: scale(.97); } to { transform: scale(1.04); } }
+    .glow { animation: pulse 3s ease-in-out infinite alternate; transform-box: fill-box; transform-origin: center; }
+    @keyframes pulse { from { opacity: .25; transform: scale(.9); } to { opacity: .7; transform: scale(1.1); } }
+    @media (prefers-reduced-motion: reduce) { .dot, .s, .shield, .glow { animation: none; opacity: 1; } .s { opacity: .6; } }
+  </style>
+  <rect width="1200" height="320" rx="24" fill="url(#bg)"/>
+  <circle class="glow" cx="1090" cy="60" r="95" fill="#3ddc97" opacity=".22"/>
+  <circle class="glow" cx="1120" cy="270" r="60" fill="#2bb6c9" opacity=".2"/>
+
+  <rect x="90" y="40" width="240" height="240" rx="22" fill="#111c19" stroke="#3ddc97" stroke-opacity=".5" stroke-width="2"/>
+  <g class="shield" transform="translate(210 112)">
+    <path d="M0 -46 L40 -30 V4 C40 30 20 46 0 54 C-20 46 -40 30 -40 4 V-30 Z" fill="none" stroke="url(#ac)" stroke-width="7" stroke-linejoin="round"/>
+    <path d="M-16 4 l12 12 l24 -26" fill="none" stroke="url(#ac)" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+  <g>
+    <circle class="dot e1" cx="134" cy="206" r="7"/><circle class="dot e2" cx="160" cy="206" r="7"/><circle class="dot e3" cx="186" cy="206" r="7"/><circle class="dot e4" cx="212" cy="206" r="7"/>
+    <circle class="dot e5" cx="238" cy="206" r="7"/><circle class="dot e6" cx="264" cy="206" r="7"/><circle class="dot e7" cx="290" cy="206" r="7"/>
+  </g>
+  <rect class="s s1" x="110" y="240" width="36" height="10" rx="5"/><rect class="s s2" x="152" y="240" width="36" height="10" rx="5"/><rect class="s s3" x="194" y="240" width="36" height="10" rx="5"/><rect class="s s4" x="236" y="240" width="36" height="10" rx="5"/><rect class="s s5" x="278" y="240" width="32" height="10" rx="5"/>
+
+  <text x="390" y="150" font-size="76" font-weight="700" fill="url(#ac)" font-family="'Segoe UI',Roboto,Helvetica,Arial,sans-serif">PassCheck</text>
+  <text x="392" y="200" font-size="28" fill="#cfe6de" font-family="'Segoe UI',Roboto,Helvetica,Arial,sans-serif">Your password never leaves your browser.</text>
+  <text x="392" y="245" font-size="20" fill="#6f8f85" font-family="'JetBrains Mono','Fira Code',Consolas,'Courier New',monospace">No servers  •  No storage  •  No logs</text>
+</svg>
