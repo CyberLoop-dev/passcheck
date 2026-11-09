@@ -15,21 +15,24 @@
 
   function pool(chars) {
     const t = { lower: false, upper: false, digit: false, sym: false };
-    let other = false;
+    let accented = false, exotic = false;
     chars.forEach((c) => {
       if (c >= 'a' && c <= 'z') t.lower = true;
       else if (c >= 'A' && c <= 'Z') t.upper = true;
       else if (isDigit(c)) t.digit = true;
-      else if (c.charCodeAt(0) > 127) other = true;
-      else t.sym = true;
+      else if (c.charCodeAt(0) > 127) {
+        const b = c.normalize('NFD')[0];
+        if ((b >= 'a' && b <= 'z') || (b >= 'A' && b <= 'Z')) accented = true; else exotic = true;
+      } else t.sym = true;
     });
-    const size = (t.lower ? 26 : 0) + (t.upper ? 26 : 0) + (t.digit ? 10 : 0) + (t.sym ? 33 : 0) + (other ? 100 : 0);
-    return { size: size || 1, types: { ...t, sym: t.sym || other } };
+    const size = (t.lower ? 26 : 0) + (t.upper ? 26 : 0) + (t.digit ? 10 : 0) + (t.sym ? 33 : 0) + (accented ? 30 : 0) + (exotic ? 100 : 0);
+    return { size: size || 1, types: { ...t, sym: t.sym || exotic } };
   }
 
   function analyze(pw) {
     const chars = pw.split(''), n = chars.length;
-    const low = chars.map((c) => { const l = c.toLowerCase(); return l.length === 1 ? l : c; });
+    // Lowercase and strip accents so that ü is treated like u. Leet swaps are undone in M.
+    const low = chars.map((c) => { const b = (c.normalize('NFD')[0] || c).toLowerCase(); return b.length === 1 ? b : c; });
     const L = low.join(''), M = low.map((c) => LEET[c] || c).join('');
     const p = pool(chars), perChar = lg(p.size);
     const hasUpper = chars.some((c) => c >= 'A' && c <= 'Z');
@@ -81,21 +84,28 @@
       picked.push(s);
     });
 
-    // Letter runs that look like a pronounceable word cost about 14 bits, not 4.7 bits per letter.
+    // Pronounceable letter runs are treated as ordinary words: about 14 bits per 7 to 10 letters,
+    // plus a bit for each leet swap. This leans cautious, so random letter strings can be under-rated.
     for (let i = 0; i < n;) {
-      if (covered[i] || !isLetter(low[i])) { i++; continue; }
+      if (covered[i] || !isLetter(M[i])) { i++; continue; }
       let j = i + 1;
-      while (j < n && !covered[j] && isLetter(low[j]) && !(chars[j] !== low[j] && chars[j - 1] === low[j - 1])) j++;
-      const len = j - i, vowels = low.slice(i, j).filter((c) => 'aeiou'.includes(c)).length;
-      if (len >= 4 && len <= 10 && vowels / len >= 0.25 && vowels / len <= 0.6) {
-        for (let k = i; k < j; k++) covered[k] = true;
-        picked.push({ i, j, bits: 14, kind: 'wordlike' });
+      while (j < n && !covered[j] && isLetter(M[j]) && !(chars[j] >= 'A' && chars[j] <= 'Z' && chars[j - 1] === low[j - 1])) j++;
+      const len = j - i, vowels = M.slice(i, j).split('').filter((c) => 'aeiou'.includes(c)).length;
+      if (len >= 4 && vowels / len >= 0.25 && vowels / len <= 0.6) {
+        let swaps = 0;
+        for (let k = i; k < j; k++) { covered[k] = true; if (M[k] !== low[k]) swaps++; }
+        picked.push({ i, j, bits: 14 * Math.ceil(len / (len > 10 ? 7 : 10)) + swaps + (hasUpper ? 1 : 0), kind: 'wordlike' });
       }
       i = j;
     }
 
     let bits = picked.reduce((s, x) => s + x.bits, 0);
-    covered.forEach((c) => { if (!c) bits += perChar; });
+    const seen = new Set();
+    covered.forEach((c, k) => {
+      if (c) return;
+      if (!isAlnum(low[k]) && seen.has(chars[k])) bits += 2; else bits += perChar; // repeated separators are predictable
+      if (!isAlnum(low[k])) seen.add(chars[k]);
+    });
     bits = Math.max(bits, 1);
     const kinds = new Set(picked.map((s) => s.kind));
     let level = bits < 28 ? 0 : bits < 40 ? 1 : bits < 60 ? 2 : bits < 80 ? 3 : 4;
@@ -128,12 +138,13 @@
     if (used === 1) f.push(['warn', 'Only one kind of character. Mixing types helps, but length helps more.']);
     if (r.kinds.has('common')) f.push(['bad', 'This matches a very common password. Attackers try these first.']);
     if (r.kinds.has('word')) f.push(['warn', 'Contains a common word, possibly with swaps like @ for a or 0 for o. Attackers know those tricks.']);
+    if (r.kinds.has('wordlike')) f.push(['info', 'Parts of it look like ordinary words. That is fine in a long passphrase, but predictable word combinations are easier to guess.']);
     if (r.kinds.has('sequence')) f.push(['warn', 'Contains a predictable sequence like abc or 123.']);
     if (r.kinds.has('keyboard')) f.push(['warn', 'Contains a keyboard pattern such as qwerty or asdf.']);
     if (r.kinds.has('repeat')) f.push(['warn', 'Repeats characters or blocks, which makes it much easier to guess.']);
     if (r.kinds.has('year')) f.push(['warn', 'Contains a year-like number. Years are among the first things guessed.']);
     if (r.n >= 8 && r.unique / r.n < 0.5) f.push(['warn', 'Many characters are reused. More variety makes guessing harder.']);
-    if (!f.some((x) => x[0] !== 'ok') && r.level >= 3) f.push(['ok', 'No obvious patterns found by this checker.']);
+    if (!f.some((x) => x[0] === 'bad' || x[0] === 'warn') && r.level >= 3) f.push(['ok', 'No obvious patterns found by this checker.']);
     return f;
   }
 
